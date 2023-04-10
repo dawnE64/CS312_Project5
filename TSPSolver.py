@@ -36,10 +36,9 @@ class TSPSolver:
 		solution found, and three null values for fields not used for this
 		algorithm</returns>
 	'''
-
 	def defaultRandomTour( self, time_allowance=60.0 ):
-		results = {}
-		cities = self._scenario.getCities()
+		results = {}  # I think this is called a dictionary? It maps strings to values to transfer to the reader.
+		cities = self._scenario.getCities()  # gets the cities that have already been generated elsewhere
 		ncities = len(cities)
 		foundTour = False
 		count = 0
@@ -47,14 +46,14 @@ class TSPSolver:
 		start_time = time.time()
 		while not foundTour and time.time()-start_time < time_allowance:
 			# create a random permutation
-			perm = np.random.permutation( ncities )
-			route = []
+			perm = np.random.permutation( ncities )  # Just a random shuffle of numbers from 0 to n-1
+			route = []  # PATH. We will be adding cities to this in a random order.
 			# Now build the route using the random permutation
 			for i in range( ncities ):
-				route.append( cities[ perm[i] ] )
-			bssf = TSPSolution(route)
+				route.append( cities[ perm[i] ] )  # PATH. We will be adding cities to this in a random order.
+			bssf = TSPSolution(route) # Creates an instance of class TSPSolution with this route which can be used to compute further information
 			count += 1
-			if bssf.cost < np.inf:
+			if bssf.cost < np.inf: # Verify that the cost isn't infinite. If not, then it is valid.
 				# Found a valid route
 				foundTour = True
 		end_time = time.time()
@@ -79,25 +78,31 @@ class TSPSolver:
 		solution found, and three null values for fields not used for this
 		algorithm</returns>
 	'''
-
 	def greedy( self,time_allowance=60.0 ):
-		results = {}
-		cities = self._scenario.getCities()
+		results = {}  # I think this is called a dictionary? It maps strings to values to transfer to the reader.
+		cities = self._scenario.getCities()  # gets the cities that have already been generated elsewhere
+		# debug_printAllDistances(cities)
 		ncities = len(cities)
 		foundTour = False
 		count = 0
 		bssf = None
 		start_time = time.time()
 		while not foundTour and time.time()-start_time < time_allowance:
-			# create a random permutation
-			perm = np.random.permutation( ncities )
-			route = []
-			# Now build the route using the random permutation
-			for i in range( ncities ):
-				route.append( cities[ perm[i] ] )
-			bssf = TSPSolution(route)
+			route = []  # PATH
+			visited_cities = set()
+			current_city = cities[0]
+			# This is simply to do n turns, it is NOT using i as a node identifier, that's current_city
+			for i in range(ncities):
+				visited_cities.add(current_city)
+				nearest_city = findNearestCity(current_city, cities, visited_cities)
+				if nearest_city is not None:
+					route.append(nearest_city)  # Append nearest_city to path
+					visited_cities.add(nearest_city)  # Consider nearest_city visited
+					current_city = nearest_city  # Set current_city to nearest_city
+			route.append(cities[0])
+			bssf = TSPSolution(route)  # Creates an TSPSolution for computing information
 			count += 1
-			if bssf.cost < np.inf:
+			if bssf.cost < np.inf:  # Verify that the cost isn't infinite. If not, then it is valid.
 				# Found a valid route
 				foundTour = True
 		end_time = time.time()
@@ -111,8 +116,31 @@ class TSPSolver:
 		return results
 
 
+''' <summary>
+		returns None if no close cities are found.
+'''
+def findNearestCity(current_city, cities, visited_cities):
+	# Compare all city differences and return the nearest one.
+	ncities = len(cities)
+	nearest_city = None
+	nearest_cost = np.inf
+	for i in range(ncities):
+		if not visited_cities.__contains__(cities[i]):  # Has next city NOT been visited?
+			distance_to_i_city = current_city.costTo(cities[i])
+			if distance_to_i_city < nearest_cost:
+				nearest_city = cities[i]
+				nearest_cost = distance_to_i_city
+	return nearest_city
 
-	''' <summary>
+
+# def debug_printAllDistances(cities):
+# 	for i in range(len(cities)):
+# 		for j in range(len(cities)):
+# 			distance = cities[i].costTo(cities[j])
+# 			print(f'dist from {i} to {j}: {distance}')
+
+
+''' <summary>
 		This is the entry point for the branch-and-bound algorithm that you will implement
 		</summary>
 		<returns>results dictionary for GUI that contains three ints: cost of best solution,
@@ -120,8 +148,7 @@ class TSPSolver:
 		not include the initial BSSF), the best solution found, and three more ints:
 		max queue size, total number of states created, and number of pruned states.</returns>
 	'''
-
-	def branchAndBound( self, time_allowance=60.0 ):
+def branchAndBound( self, time_allowance=60.0 ):
 		# Use RandomDefault to learn interfaces
 		# TODO: Loop check time and update path (update current solution if new one is better)
 		#  at each leaf node, and at 60 just return current PATH
@@ -130,15 +157,13 @@ class TSPSolver:
 		pass
 
 
-
-	''' <summary>
+''' <summary>
 		This is the entry point for the algorithm you'll write for your group project.
 		</summary>
 		<returns>results dictionary for GUI that contains three ints: cost of best solution,
 		time spent to find best solution, total number of solutions found during search, the
 		best solution found.  You may use the other three field however you like.
 		algorithm</returns>
-	'''
-
-	def fancy( self,time_allowance=60.0 ):
-		pass
+'''
+def fancy( self,time_allowance=60.0 ):
+	pass
