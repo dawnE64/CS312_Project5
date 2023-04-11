@@ -146,11 +146,46 @@ def findNearestCity(current_city, cities, visited_cities):
 		max queue size, total number of states created, and number of pruned states.</returns>
 	'''
 def branchAndBound( self, time_allowance=60.0 ):
-		# Use RandomDefault to learn interfaces
-		# TODO: Loop check time and update path (update current solution if new one is better)
-		#  at each leaf node, and at 60 just return current PATH
-		# time.time could work unless they have a built in function. Consider start time
-		# TODO update the draw as well
+		# init
+		results = {}  # I think this is called a dictionary? It maps strings to values to transfer to the reader.
+		cities = self._scenario.getCities()  # gets the cities that have already been generated elsewhere
+		ncities = len(cities)
+		foundTour = False
+		count = 0
+		bssf = None
+		start_time = time.time()
+		# todo loop until hit leaf
+		while not foundTour and time.time()-start_time < time_allowance:
+			# create a random permutation
+			perm = np.random.permutation( ncities )  # Just a random shuffle of numbers from 0 to n-1
+			route = []  # PATH. We will be adding cities to this in a random order.
+			# Now build the route using the random permutation
+			for i in range( ncities ):
+				route.append( cities[ perm[i] ] )  # PATH. We will be adding cities to this in a random order.
+			bssf = TSPSolution(route) # Creates an instance of class TSPSolution with this route which can be used to compute further information
+			count += 1
+			if bssf.cost < np.inf: # Verify that the cost isn't infinite. If not, then it is valid.
+				# Found a valid route
+				foundTour = True
+			# todo calc lower bound
+			# BELOW IS THE PARTS FOR MY HEAP CLASS
+			branchAndBoundHeap = BranchAndBoundHeap()
+			'''
+			route = []  # PATH
+			visited_cities = set()
+			current_city = cities[0]
+			'''
+		# todo handle hitting leaf
+		# todo save current bssf
+		end_time = time.time()
+		results['cost'] = bssf.cost if foundTour else math.inf
+		results['time'] = end_time - start_time
+		results['count'] = count
+		results['soln'] = bssf
+		results['max'] = None
+		results['total'] = None
+		results['pruned'] = None
+		return results
 		pass
 
 

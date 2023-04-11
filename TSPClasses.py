@@ -170,3 +170,12 @@ class City:
 
 		return int(math.ceil(cost * self.MAP_SCALE))
 
+
+class BranchAndBoundHeap:
+	def __init__(self, visited_cities, current_node, lower_bound):
+		self.visited_cities = visited_cities
+		self.current_node = current_node
+		self.lower_bound = lower_bound
+
+	def calculateLowerBound(self):
+		pass
