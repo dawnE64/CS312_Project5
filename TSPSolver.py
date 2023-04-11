@@ -84,31 +84,28 @@ class TSPSolver:
 		# debug_printAllDistances(cities)
 		ncities = len(cities)
 		foundTour = False
-		count = 0
 		bssf = None
 		start_time = time.time()
-		while not foundTour and time.time()-start_time < time_allowance:
-			route = []  # PATH
-			visited_cities = set()
-			current_city = cities[0]
-			# This is simply to do n turns, it is NOT using i as a node identifier, that's current_city
-			for i in range(ncities):
-				visited_cities.add(current_city)
-				nearest_city = findNearestCity(current_city, cities, visited_cities)
-				if nearest_city is not None:
-					route.append(nearest_city)  # Append nearest_city to path
-					visited_cities.add(nearest_city)  # Consider nearest_city visited
-					current_city = nearest_city  # Set current_city to nearest_city
-			route.append(cities[0])
-			bssf = TSPSolution(route)  # Creates an TSPSolution for computing information
-			count += 1
-			if bssf.cost < np.inf:  # Verify that the cost isn't infinite. If not, then it is valid.
-				# Found a valid route
-				foundTour = True
+		route = []  # PATH
+		visited_cities = set()
+		current_city = cities[0]
+		# n turns. i is NOT a node id.
+		for i in range(ncities):
+			visited_cities.add(current_city)
+			nearest_city = findNearestCity(current_city, cities, visited_cities)
+			if nearest_city is not None:
+				route.append(nearest_city)  # Append nearest_city to path
+				visited_cities.add(nearest_city)  # Consider nearest_city visited
+				current_city = nearest_city  # Set current_city to nearest_city
+		route.append(cities[0])
+		bssf = TSPSolution(route)  # Creates an TSPSolution for computing information
+		if bssf.cost < np.inf:  # Verify that the cost isn't infinite. If not, then it is valid.
+			# Found a valid route
+			foundTour = True
 		end_time = time.time()
 		results['cost'] = bssf.cost if foundTour else math.inf
 		results['time'] = end_time - start_time
-		results['count'] = count
+		results['count'] = 0  # Greedy always returns after the first attempt.
 		results['soln'] = bssf
 		results['max'] = None
 		results['total'] = None
